@@ -15,9 +15,9 @@ public class Lexer {
     public static String strPat = "\"(\\\\\"|\\\\\\\\|\\\\n|[^\"])*\"";
     public static String identifyPat = "[a-z_A-Z][a-z_A-Z0-9]*|==|<=|>=|&&|\\|\\||\\p{Punct}";
 
-    public static String regexPat = "\\s*((//.*)|("+ numPat +")|("+strPat+")|("+identifyPat+")?";
+    public static String regexPat = "\\s*((//.*)|("+ numPat +")|("+strPat+")|("+identifyPat+"))?";
     private Pattern pattern = Pattern.compile(regexPat);
-    private ArrayList<Token> queue = new ArrayList<>();
+    private ArrayList<Token> queue = new ArrayList<Token>();
     private boolean hasMore;
     private LineNumberReader reader;
 
