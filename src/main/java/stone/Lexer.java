@@ -26,8 +26,20 @@ public class Lexer {
         reader = new LineNumberReader(r);
     }
 
-    public Token read(){
+    public Token read() throws ParseException{
+        if(fillQueue(0)){
+            return queue.remove(0);
+        }else{
+            return Token.EOF;
+        }
+    }
 
+    public Token peek(int i)throws ParseException{
+        if(fillQueue(i)){
+            return queue.get(i);
+        }else{
+            return Token.EOF;
+        }
     }
 
     private boolean fillQueue(int i)throws ParseException{
@@ -46,7 +58,7 @@ public class Lexer {
         try {
             line = reader.readLine();
         } catch (IOException e) {
-            throw new ParseException();
+            throw new ParseException(e);
         }
         if(line == null){
             hasMore = false;
@@ -69,6 +81,38 @@ public class Lexer {
     }
 
     private void addToken(int lineNo, Matcher matcher) {
+        String m = matcher.group(1);
+        if(m != null){ // if not a space
+            if(matcher.group(2) == null){ // if not a comment
+                Token token;
+                if(matcher.group(3)!=null){
+                    token = new NumToken(lineNo, Integer.parseInt(m));
+                }else if(matcher.group(4) != null){
+                    token = new StrToken(lineNo, toStringLiteral(m));
+                }else{
+                    token = new IdToken(lineNo, m);
+                }
+                queue.add(token);
+            }
+        }
+    }
 
+    private String toStringLiteral(String s) {
+        StringBuilder sb = new StringBuilder();
+        int len = s.length() - 1;
+        for(int i = 1; i < len; i++){
+            char c = s.charAt(i);
+            if(c == '\\' && i + 1 < len){
+                int c2 = s.charAt(i+1);
+                if(c2 == '"' || c2 == '\\'){
+                    c = s.charAt(++i);
+                }else if(c2 == 'n'){
+                    ++i;
+                    c = '\n';
+                }
+            }
+            sb.append(c);
+        }
+        return sb.toString();
     }
 }
